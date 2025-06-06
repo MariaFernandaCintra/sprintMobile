@@ -1,24 +1,17 @@
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { useState, useEffect, useCallback } from "react";
+
+import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { getToday } from "../utils/dateUtils";
-import api from "../services/axios";
 import { useNavigation } from "@react-navigation/native";
-import * as SecureStore from "expo-secure-store";
+import { getToday } from "../../utils/dateUtils";
+import api from "../../services/axios";
+
 import CustomModal from "./CustomModal";
 
-const AtualizarReservaModal = ({ visible, onClose, reserva }) => {
+import * as SecureStore from "expo-secure-store";
 
-  if (!reserva) {
-    console.error("Reserva inválida:", reserva);
-    return;
-  }
+const ReservarModal = ({ isOpen, onClose, idSala }) => {
   // Estados para data e hora
   const [data, setData] = useState(new Date());
   const [horaInicio, setHoraInicio] = useState(new Date());
@@ -34,18 +27,30 @@ const AtualizarReservaModal = ({ visible, onClose, reserva }) => {
 
   // Estados para o modal de feedback
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalInfo, setModalInfo] = useState({ type: "success", title: "", message: "" });
+  const [modalInfo, setModalInfo] = useState({
+    type: "success",
+    title: "",
+    message: "",
+  });
 
   // Hook de navegação
   const navigation = useNavigation();
+
+  const formatarData = useCallback((date) => {
+    if (!(date instanceof Date)) return "";
+    const dia = date.getDate().toString().padStart(2, "0");
+    const mes = (date.getMonth() + 1).toString().padStart(2, "0");
+    const ano = date.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  }, []);
 
   // Efeito para buscar o ID do usuário ao montar o componente
   useEffect(() => {
     const buscarIdUsuario = async () => {
       try {
-        const idUsuarioString = await SecureStore.getItemAsync("idUsuario");
-        if (idUsuarioString) {
-          const idUsuario = Number(idUsuarioString);
+        const idUsuarioStr = await SecureStore.getItemAsync("idUsuario");
+        if (idUsuarioStr) {
+          const idUsuario = Number(idUsuarioStr);
           const response = await api.getUsuarioById(idUsuario);
           setIdUsuario(response.data.usuario.id_usuario);
         }
@@ -53,38 +58,9 @@ const AtualizarReservaModal = ({ visible, onClose, reserva }) => {
         console.error("Erro ao buscar usuário:", error);
       }
     };
+
     buscarIdUsuario();
-
-    if (visible && reserva) {
-      // Data: de "31-12-2025" para Date(2025, 11, 31)
-      if (reserva.data) {
-        const [dia, mes, ano] = reserva.data.split("-");
-        const novaData = new Date(ano, mes - 1, dia);
-        setData(novaData);
-      }
-
-      // Hora de início
-      if (reserva.hora_inicio) {
-        const [h, m] = reserva.hora_inicio.split(":");
-        const novaHoraInicio = new Date();
-        novaHoraInicio.setHours(parseInt(h), parseInt(m), 0, 0);
-        setHoraInicio(new Date(novaHoraInicio)); // Garante nova instância
-      }
-
-      // Hora de fim
-      if (reserva.hora_fim) {
-        const [h, m] = reserva.hora_fim.split(":");
-        const novaHoraFim = new Date();
-        novaHoraFim.setHours(parseInt(h), parseInt(m), 0, 0);
-        setHoraFim(new Date(novaHoraFim)); // Garante nova instância
-      }
-    }
-  }, [reserva, visible]); // Executa apenas uma vez na montagem
-
-  const formatarData = (data) => {
-    if (!(data instanceof Date)) return "";
-    return data.toLocaleDateString("pt-BR");
-  };
+  }, []); // Executa apenas uma vez na montagem
 
   // Função para ajustar a hora de fim automaticamente (1 hora após o início)
   const ajustarHoraFim = useCallback(() => {
@@ -111,15 +87,18 @@ const AtualizarReservaModal = ({ visible, onClose, reserva }) => {
     const formattedHoraInicio = formatarHoraComSegundosZero(horaInicio);
     const formattedHoraFim = formatarHoraComSegundosZero(horaFim);
 
-    const dadosReserva = {
+    const reserva = {
       data: formattedData,
       hora_inicio: formattedHoraInicio,
       hora_fim: formattedHoraFim,
       fk_id_usuario: idUsuario,
+      fk_id_sala: idSala,
     };
 
+    // console.log("Objeto reserva:", reserva);
+
     try {
-      const response = await api.putAtualizarReserva(reserva.id_reserva, dadosReserva);
+      const response = await api.postReserva(reserva);
       setModalInfo({
         type: "success",
         title: "Sucesso",
@@ -135,23 +114,31 @@ const AtualizarReservaModal = ({ visible, onClose, reserva }) => {
       setModalVisible(true);
       console.log(error);
     }
-  }, [ajustarHoraFim, data, formatarHoraComSegundosZero, horaFim, horaInicio, idUsuario, visible, reserva]); // Depende de todos os valores usados dentro
+  }, [
+    ajustarHoraFim,
+    data,
+    formatarHoraComSegundosZero,
+    horaFim,
+    horaInicio,
+    idSala,
+    idUsuario,
+  ]); // Depende de todos os valores usados dentro
 
   // Função para lidar com o fechamento do modal de feedback
   const handleModalClose = useCallback(() => {
     setModalVisible(false);
     if (modalInfo.type === "success") {
+      navigation.navigate("Principal");
       onClose();
     }
   }, [modalInfo.type, navigation, onClose]); // Depende de valores externos
 
   return (
     <>
-      <Modal visible={visible} transparent animationType="fade">
-
+      <Modal visible={isOpen} transparent animationType="fade">
         <View style={styles.overlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.title}>Atualizar Reserva</Text>
+          <View style={styles.modal}>
+            <Text style={styles.title}>Reservar</Text>
 
             <Text style={styles.inputTitle}>Data</Text>
             <TouchableOpacity
@@ -229,7 +216,7 @@ const AtualizarReservaModal = ({ visible, onClose, reserva }) => {
                 <Text style={styles.buttonText}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.button} onPress={handleReserva}>
-                <Text style={styles.buttonText}>Atualizar</Text>
+                <Text style={styles.buttonText}>Reservar</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -254,12 +241,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  modalContainer: {
-    backgroundColor: "white",
+  modal: {
+    backgroundColor: "rgb(227, 227, 227)",
     padding: 20,
-    width: "60%",
-    maxHeight: "70%",
-    borderRadius: 10,
+    borderRadius: 8,
+    width: 300,
   },
   title: {
     fontSize: 20,
@@ -296,4 +282,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AtualizarReservaModal;
+export default ReservarModal;

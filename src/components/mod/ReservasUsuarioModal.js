@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+
+import { useState } from "react";
+
 import {
   Modal,
   View,
@@ -7,6 +9,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
+
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import AntDesign from "@expo/vector-icons/AntDesign";
 

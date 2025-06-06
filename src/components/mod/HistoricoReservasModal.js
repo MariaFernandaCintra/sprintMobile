@@ -1,4 +1,4 @@
-import React from "react";
+
 import {
   Modal,
   View,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
+
 import AntDesign from "@expo/vector-icons/AntDesign";
 
 // Função para formatar a data e hora (já está perfeita!)
@@ -28,7 +29,12 @@ const formatarDataHora = (dataString) => {
   };
 };
 // NOVO: Adicione 'salas' como uma prop
-const ReservasDeletadas = ({ visible, onClose, reservas = [], salas = [] }) => {
+const HistoricoReservasModal = ({
+  visible,
+  onClose,
+  reservas = [],
+  salas = [],
+}) => {
   // Função auxiliar para encontrar o nome da sala pelo ID
   const getNomeSala = (idSala) => {
     const salaEncontrada = salas.find((sala) => sala.id_sala === idSala); // Assumindo que o objeto sala tem 'id_sala' e 'nome'
@@ -42,7 +48,7 @@ const ReservasDeletadas = ({ visible, onClose, reservas = [], salas = [] }) => {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={styles.modalTitle}>Reservas Deletadas</Text>
+            <Text style={styles.modalTitle}>Histórico de Reservas</Text>
             <TouchableOpacity onPress={onClose}>
               <AntDesign name="close" size={24} color="red" />
             </TouchableOpacity>
@@ -54,12 +60,15 @@ const ReservasDeletadas = ({ visible, onClose, reservas = [], salas = [] }) => {
             ]}
           >
             {reservas.length > 0 ? (
-              reservas.map((reserva) => {
-                const { data } = formatarDataHora(reserva.data_reserva); // usa data_reserva do backend
-                const nomeDaSala = getNomeSala(reserva.fk_id_sala); // fk_id_sala do backend
-
+              reservas.map((reserva, index) => {
+                const { data } = formatarDataHora(reserva.data);
+                const nomeDaSala = getNomeSala(reserva.fk_id_sala); // Use a função auxiliar para obter o nome
+                const key =
+                  reserva.id_log ||
+                  reserva.data_hora_log ||
+                  `${reserva.id_reserva}-${index}`;
                 return (
-                  <View key={reserva.id_reserva} style={styles.itemReserva}>
+                  <View key={key} style={styles.itemReserva}>
                     <Text>
                       {nomeDaSala} - {data}
                     </Text>
@@ -180,4 +189,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ReservasDeletadas;
+export default HistoricoReservasModal;

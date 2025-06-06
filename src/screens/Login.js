@@ -1,5 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+
+import { useState } from "react";
+
 import {
   Image,
   ImageBackground,
@@ -11,12 +12,16 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import api from "../services/axios";
+
 import { useNavigation } from "@react-navigation/native";
+import api from "../services/axios";
+
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
+import CustomModal from "../components/mod/CustomModal";
+
+import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
-import CustomModal from "../components/CustomModal";
 
 export default function Login() {
   const navigation = useNavigation();

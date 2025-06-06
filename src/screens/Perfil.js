@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
+
 import {
   View,
   Text,
@@ -9,18 +11,19 @@ import {
   ImageBackground,
   StyleSheet,
 } from "react-native";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import * as SecureStore from "expo-secure-store";
-import { useNavigation } from "@react-navigation/native";
 
-import ReservasUsuarioModal from "../components/ReservasUsuarioModal";
-import AtualizarReservaModal from "../components/AtualizarReservaModal";
-import HistoricoReservasModal from "../components/HistoricoReservasModal";
-import ReservasDeletadas from "../components/ReservasDeletadasModal";
-import CustomModal from "../components/CustomModal";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { useNavigation } from "@react-navigation/native";
+import api from "../services/axios";
+
+import ReservasUsuarioModal from "../components/mod/ReservasUsuarioModal";
+import AtualizarReservaModal from "../components/mod/AtualizarReservaModal";
+import HistoricoReservasModal from "../components/mod/HistoricoReservasModal";
+import ReservasDeletadas from "../components/mod/ReservasDeletadasModal";
+import CustomModal from "../components/mod/CustomModal";
 
 import logo from "../img/logo.png";
-import api from "../services/axios"; // Garanta que este import esteja correto
+import * as SecureStore from "expo-secure-store";
 
 function Perfil() {
   const [reservas, setReservas] = useState([]);

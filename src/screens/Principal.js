@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+
+import { useEffect, useState } from "react";
+
 import {
   FlatList,
   ImageBackground,
@@ -8,13 +10,16 @@ import {
   View,
   Button,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import * as SecureStore from "expo-secure-store";
-import ReservarModal from "../components/ReservarModal";
-import CustomModal from "../components/CustomModal";
 import api from "../services/axios";
+
+import ReservarModal from "../components/mod/ReservarModal";
+import CustomModal from "../components/mod/CustomModal";
+
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 function Principal({ navigation }) {
   const [salas, setSalas] = useState([]);

@@ -1,5 +1,6 @@
-import React from "react";
+
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 export default function CustomModal({
@@ -10,11 +11,12 @@ export default function CustomModal({
   buttonText = "OK",
   type = "info", // 'success' | 'error' | 'info'
 }) {
-  const iconProps = {
-    success: { name: "check-circle", color: "#4caf50" },
-    error: { name: "error", color: "#f44336" },
-    info: { name: "info", color: "#2196f3" }, // Adicionado o tipo 'info'
-  }[type] || {};
+  const iconProps =
+    {
+      success: { name: "check-circle", color: "#4caf50" },
+      error: { name: "error", color: "#f44336" },
+      info: { name: "info", color: "#2196f3" }, // Adicionado o tipo 'info'
+    }[type] || {};
 
   return (
     <Modal
@@ -67,13 +69,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   success: {
-    backgroundColor: "#ffffff", 
+    backgroundColor: "#ffffff",
   },
   error: {
-    backgroundColor: "#ffffff", 
+    backgroundColor: "#ffffff",
   },
   info: {
-    backgroundColor: "#ffffff", 
+    backgroundColor: "#ffffff",
   },
   title: {
     fontSize: 22,
